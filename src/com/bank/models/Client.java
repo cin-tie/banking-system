@@ -47,6 +47,6 @@ public class Client {
 
     @Override
     public String toString(){
-        return String.format("%s, %s, %s, %s, %s, %s", firstName, lastName, email, phoneNumber, address, registrationDate);
+        return String.format("%s, %s, %s, %s, %, %s", firstName, lastName, email, phoneNumber, address.toString(), registrationDate.toString());
     }
 }
