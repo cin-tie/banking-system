@@ -2,12 +2,24 @@ package com.bank.models;
 
 import java.time.LocalDate;
 
+import com.bank.exceptions.AccountNotActiveException;
+import com.bank.exceptions.InsufficientFundsException;
+import com.bank.exceptions.InvalidAmountException;
+
 public abstract class BankAccount {
     private String accountNumber;
     private Client owner;
     private double balance;
     private LocalDate openingDate;
     private boolean isActive;
+
+    BankAccount(String accountNumber, Client owner, double balance, LocalDate openingDate, boolean isActive){
+        this.accountNumber = accountNumber;
+        this.owner = owner;
+        this.balance = balance;
+        this.openingDate = openingDate;
+        this.isActive = isActive;
+    }
 
     public String getAccountNumber() { return accountNumber; }
     public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
@@ -24,13 +36,18 @@ public abstract class BankAccount {
     public boolean getIsActive() { return isActive; }
     public void setIsActive(boolean isActive) { this.isActive = isActive; }
 
-    public void deposit(double amount){
-        this.balance += amount;
+    public void deposit(double amount) throws InvalidAmountException, AccountNotActiveException{
+        if(!isActive)
+            throw new AccountNotActiveException(accountNumber, isActive);
+        
+        if(amount <= 0)
+            throw new InvalidAmountException(amount);
+
+        balance += amount;
+
     }
 
-    public void withdraw(double amount){
-        this.balance -= amount;
-    }
+    public abstract void withdraw(double amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException;
 
     public String getAccountInfo(){
         return String.format(
