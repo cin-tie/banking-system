@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.bank.exceptions.AccountNotActiveException;
 import com.bank.exceptions.InsufficientFundsException;
 import com.bank.exceptions.InvalidAmountException;
+import com.bank.models.enums.AccountType;
 
 public class CheckingAccount extends BankAccount{
     private double overdraftLimit;
@@ -12,6 +13,7 @@ public class CheckingAccount extends BankAccount{
     CheckingAccount(String accountNumber, Client owner, double balance, LocalDate openingDate, boolean isActive, double overdraftLimit){
         super(accountNumber, owner, balance, openingDate, isActive);
         this.overdraftLimit = overdraftLimit;
+        this.setAccountType(AccountType.CHECKING);
     }
     
     public double getOverdraftLimit() { return overdraftLimit; }

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.bank.exceptions.AccountNotActiveException;
 import com.bank.exceptions.InsufficientFundsException;
 import com.bank.exceptions.InvalidAmountException;
+import com.bank.models.enums.AccountType;
 
 public abstract class BankAccount {
     private String accountNumber;
@@ -12,6 +13,7 @@ public abstract class BankAccount {
     private double balance;
     private LocalDate openingDate;
     private boolean isActive;
+    private AccountType accountType;
 
     BankAccount(String accountNumber, Client owner, double balance, LocalDate openingDate, boolean isActive){
         this.accountNumber = accountNumber;
@@ -35,6 +37,9 @@ public abstract class BankAccount {
 
     public boolean getIsActive() { return isActive; }
     public void setIsActive(boolean isActive) { this.isActive = isActive; }
+
+    public AccountType getAccountType() { return accountType; }
+    protected void setAccountType(AccountType accountType) { this.accountType = accountType; }
 
     public void deposit(double amount) throws InvalidAmountException, AccountNotActiveException{
         if(!isActive)
