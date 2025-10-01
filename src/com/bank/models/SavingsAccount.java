@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.bank.exceptions.AccountNotActiveException;
 import com.bank.exceptions.InsufficientFundsException;
 import com.bank.exceptions.InvalidAmountException;
+import com.bank.models.enums.AccountType;
 
 public class SavingsAccount extends BankAccount{
     private double interestRate;
@@ -12,6 +13,7 @@ public class SavingsAccount extends BankAccount{
     SavingsAccount(String accountNumber, Client owner, double balance, LocalDate openingDate, boolean isActive, double interestRate){
         super(accountNumber, owner, balance, openingDate, isActive);
         this.interestRate = interestRate;
+        this.setAccountType(AccountType.SAVINGS);
     }
 
     public double getInterestRate() { return interestRate; }
@@ -29,6 +31,11 @@ public class SavingsAccount extends BankAccount{
             throw new InsufficientFundsException(String.format("Overdraft limit exceeded in account %s. Current balance: %.2f, requested: %.2f", getAccountNumber(), getBalance(), amount));
     
         setBalance(getBalance() - amount);
+    }
+
+    @Override
+    public boolean canWithdraw(double amount) {
+        return amount <= getBalance();
     }
 
     public void applyInterest() throws AccountNotActiveException{
