@@ -53,6 +53,7 @@ public abstract class BankAccount {
     }
 
     public abstract void withdraw(double amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException;
+    public abstract boolean canWithdraw(double amount);
 
     public String getAccountInfo(){
         return String.format(

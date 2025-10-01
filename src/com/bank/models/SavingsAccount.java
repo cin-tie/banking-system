@@ -33,6 +33,11 @@ public class SavingsAccount extends BankAccount{
         setBalance(getBalance() - amount);
     }
 
+    @Override
+    public boolean canWithdraw(double amount) {
+        return amount <= getBalance();
+    }
+
     public void applyInterest() throws AccountNotActiveException{
         if(!getIsActive())
             throw new AccountNotActiveException(getAccountNumber(), getIsActive());

@@ -33,4 +33,9 @@ public class CheckingAccount extends BankAccount{
 
         setBalance(getBalance() - amount);
     }
+
+    @Override
+    public boolean canWithdraw(double amount) {
+        return amount <= getBalance() + overdraftLimit;
+    }
 }
