@@ -10,8 +10,8 @@ import com.bank.models.enums.AccountType;
 public class CheckingAccount extends BankAccount{
     private double overdraftLimit;
     
-    CheckingAccount(String accountNumber, Client owner, double balance, LocalDate openingDate, boolean isActive, double overdraftLimit){
-        super(accountNumber, owner, balance, openingDate, isActive);
+    CheckingAccount(Client owner, double balance, LocalDate openingDate, boolean isActive, double overdraftLimit){
+        super(owner, balance, openingDate, isActive);
         this.overdraftLimit = overdraftLimit;
         this.setAccountType(AccountType.CHECKING);
     }

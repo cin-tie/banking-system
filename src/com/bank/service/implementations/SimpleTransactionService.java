@@ -16,11 +16,14 @@ import com.bank.models.BankAccount;
 import com.bank.models.Transaction;
 import com.bank.models.enums.TransactionType;
 import com.bank.service.interfaces.TransactionService;
+import com.bank.util.IdGenerator;
 
 public class SimpleTransactionService implements TransactionService{
     private Map<String, BankAccount> accounts;
     private Map<String, List<Transaction>> transactionHistory;
     private Map<String, Transaction> transactions;
+
+    private IdGenerator idGenerator;
 
     public SimpleTransactionService(){
         this.accounts = new ConcurrentHashMap<>();
@@ -113,7 +116,7 @@ public class SimpleTransactionService implements TransactionService{
     }
 
     private Transaction createTransaction(String fromAccountNumber, String toAccountNumber, double amount, TransactionType type){
-        String transactionId = "TXN" + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 8);
+        String transactionId = idGenerator.generateTransactionId();
         return new Transaction(transactionId, fromAccountNumber, toAccountNumber, amount, LocalDateTime.now(), type);
     }
 }

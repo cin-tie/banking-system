@@ -3,6 +3,8 @@ package com.bank.models;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.bank.util.IdGenerator;
+
 public class Client {
     private final String uniqueId;
     private String firstName;
@@ -12,8 +14,10 @@ public class Client {
     private Address address;
     private final LocalDate registrationDate;
 
+    private IdGenerator idGenerator;
+
     Client() {
-        uniqueId = String.valueOf(UUID.randomUUID());
+        uniqueId = idGenerator.generateClientId();
         registrationDate = LocalDate.now();
     }
 

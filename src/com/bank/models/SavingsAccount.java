@@ -10,8 +10,8 @@ import com.bank.models.enums.AccountType;
 public class SavingsAccount extends BankAccount{
     private double interestRate;
 
-    SavingsAccount(String accountNumber, Client owner, double balance, LocalDate openingDate, boolean isActive, double interestRate){
-        super(accountNumber, owner, balance, openingDate, isActive);
+    SavingsAccount(Client owner, double balance, LocalDate openingDate, boolean isActive, double interestRate){
+        super(owner, balance, openingDate, isActive);
         this.interestRate = interestRate;
         this.setAccountType(AccountType.SAVINGS);
     }

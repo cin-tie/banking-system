@@ -6,6 +6,7 @@ import com.bank.exceptions.AccountNotActiveException;
 import com.bank.exceptions.InsufficientFundsException;
 import com.bank.exceptions.InvalidAmountException;
 import com.bank.models.enums.AccountType;
+import com.bank.util.IdGenerator;
 
 public abstract class BankAccount {
     private String accountNumber;
@@ -15,8 +16,10 @@ public abstract class BankAccount {
     private boolean isActive;
     private AccountType accountType;
 
-    BankAccount(String accountNumber, Client owner, double balance, LocalDate openingDate, boolean isActive){
-        this.accountNumber = accountNumber;
+    private IdGenerator idGenerator;
+
+    BankAccount(Client owner, double balance, LocalDate openingDate, boolean isActive){
+        this.accountNumber = idGenerator.generateAccountNumber(accountNumber);
         this.owner = owner;
         this.balance = balance;
         this.openingDate = openingDate;
