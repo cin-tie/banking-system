@@ -60,7 +60,7 @@ public abstract class BankAccount {
     }
 
     public void withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException{
-        validateAccountActive();;
+        validateAccountActive();
         validatePositiveAmount(amount);
         validateSufficientFunds(amount);
 
@@ -82,6 +82,8 @@ public abstract class BankAccount {
 
         Transaction transferTransaction = new Transaction(UUID.randomUUID().toString(), this, recipient, amount, LocalDateTime.now(), TransactionType.TRANSFER, TransactionStatus.IN_PROCESS);
 
+        BigDecimal[] backupBalance = {this.balance, recipient.balance};
+
         if(approveTransaction(transferTransaction) && recipient.approveTransaction(transferTransaction)){
             try{
                 processTransaction(transferTransaction);
@@ -89,7 +91,7 @@ public abstract class BankAccount {
                 transferTransaction.setStatus(TransactionStatus.SUCCESS);
             }
             catch (Exception e){
-                rollbackTransaction(transferTransaction);
+                rollbackTransaction(transferTransaction, backupBalance);
                 transferTransaction.setStatus(TransactionStatus.FAILED);
                 throw new RuntimeException("Transfer failed: " + e.getMessage(), e);
             }
@@ -130,19 +132,27 @@ public abstract class BankAccount {
         }
     }
 
-    protected void rollbackTransaction(Transaction transaction){
+    protected void rollbackTransaction(Transaction transaction, BigDecimal[] backupBalance){
         switch (transaction.getType()) {
             case TRANSFER:
                 if (transaction.getFromAccount().equals(this)) {
-                    this.balance = this.balance.add(transaction.getAmount());
+                    this.balance = backupBalance[0];
                 } else if (transaction.getToAccount().equals(this)) {
-                    this.balance = this.balance.subtract(transaction.getAmount());
+                    this.balance = backupBalance[1];
                 }
                 break;
 
             default:
                 break;
         }
+    }
+
+    public void applyInterest() throws AccountNotActiveException, InvalidAmountException{
+        validateAccountActive();
+        validatePositiveAmount(balance);
+
+        BigDecimal interest = getBalance().multiply(getInterestRate().divide(BigDecimal.valueOf(100)));    
+        deposit(interest);
     }
 
     public void deactivate() throws AccountDeactivationException, InsufficientFundsException, InvalidAmountException, AccountNotActiveException {
@@ -155,17 +165,17 @@ public abstract class BankAccount {
         isActive = true;
     }
 
-    private void validateAccountActive() throws AccountNotActiveException{
+    protected void validateAccountActive() throws AccountNotActiveException{
         if(!isActive)
             throw new AccountNotActiveException(id, isActive);
     }
 
-    private void validatePositiveAmount(BigDecimal amount) throws InvalidAmountException{
+    protected void validatePositiveAmount(BigDecimal amount) throws InvalidAmountException{
         if(amount == null || amount.compareTo(BigDecimal.ZERO) != 1)
             throw new InvalidAmountException(amount);
     }
 
-    private void validateSufficientFunds(BigDecimal amount) throws InsufficientFundsException{
+    protected void validateSufficientFunds(BigDecimal amount) throws InsufficientFundsException{
         BigDecimal availableBalance = balance.add(overdraftLimit);
         if(amount.compareTo(availableBalance) == 1)
             throw new InsufficientFundsException(id, availableBalance, amount);

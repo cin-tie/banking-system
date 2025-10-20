@@ -28,13 +28,6 @@ public class SavingsAccount extends BankAccount{
     public void setMinimumBalance(BigDecimal minimumBalance){ this.minimumBalance = minimumBalance; }
     public void setMonthlyWithdrawalLimit(int monthlyWithdrawalLimit){ this.monthlyWithdrawalLimit = monthlyWithdrawalLimit; }
 
-    public void applyInterest() throws AccountNotActiveException, InvalidAmountException{
-        if(getIsActive() && getBalance().compareTo(BigDecimal.ZERO) > 0){
-            BigDecimal interest = getBalance().multiply(getInterestRate().divide(BigDecimal.valueOf(100)));    
-            deposit(interest);
-        }
-    }
-
     @Override
     public void withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException {
         if(withdrawalsThisMonth >= monthlyWithdrawalLimit){
@@ -43,7 +36,7 @@ public class SavingsAccount extends BankAccount{
 
         BigDecimal remainingBalance = getBalance().subtract(amount);
         
-        if(remainingBalance.compareTo(minimumBalance) < 0){
+        if(remainingBalance.compareTo(minimumBalance) == -1){
             throw new InsufficientFundsException(String.format("Cannot go below minimum balance of %s", minimumBalance.toString()));
         }        
         super.withdraw(amount);
