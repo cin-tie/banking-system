@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -26,12 +25,14 @@ public class SimpleTransactionService implements TransactionService{
     private IdGenerator idGenerator;
 
     public SimpleTransactionService(){
+        this.idGenerator = new IdGenerator();
         this.accounts = new ConcurrentHashMap<>();
         this.transactionHistory = new ConcurrentHashMap<>();
         this.transactions = new ConcurrentHashMap<>();
     }
 
     public SimpleTransactionService(Map<String, BankAccount> existingAccounts){
+        this.idGenerator = new IdGenerator();
         this.accounts = existingAccounts;
         this.transactionHistory = new ConcurrentHashMap<>();
         this.transactions = new ConcurrentHashMap<>();
@@ -75,8 +76,8 @@ public class SimpleTransactionService implements TransactionService{
         fromAccount.withdraw(amount);
         toAccount.deposit(amount);
 
-        Transaction outgoingTransaction = createTransaction(fromAccountNumber, toAccountNumber, amount, TransactionType.TRANSFER_OUT);
-        Transaction incomingTransaction = createTransaction(fromAccountNumber, toAccountNumber, amount, TransactionType.TRANSFER_IN);
+        Transaction outgoingTransaction = createTransaction(fromAccountNumber, toAccountNumber, amount, TransactionType.TRANSFER);
+        Transaction incomingTransaction = createTransaction(fromAccountNumber, toAccountNumber, amount, TransactionType.TRANSFER);
     
         saveTransaction(outgoingTransaction, fromAccountNumber);
         saveTransaction(incomingTransaction, toAccountNumber);
