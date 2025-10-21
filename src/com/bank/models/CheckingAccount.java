@@ -15,10 +15,11 @@ public class CheckingAccount extends BankAccount{
     }
 
     @Override
-    public void withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException{
+    public Transaction withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException{
         BigDecimal resultBalance = getBalance().subtract(amount);
         boolean isActive = resultBalance.compareTo(BigDecimal.ZERO) != -1;
-        super.withdraw(amount);
+        Transaction transaction = super.withdraw(amount);
         setIsActive(isActive);
+        return transaction;
     }    
 }

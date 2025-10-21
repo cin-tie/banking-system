@@ -14,7 +14,7 @@ public class SavingsAccount extends BankAccount{
     private int monthlyWithdrawalLimit;
     private int withdrawalsThisMonth;
 
-    SavingsAccount(String id, Client owner, BigDecimal balance, LocalDateTime openAt, boolean isActive, BigDecimal interestRate, BigDecimal overdraftLimit, BigDecimal minimumBalance,  int monthlyWithdrawalLimit){
+    public SavingsAccount(String id, Client owner, BigDecimal balance, LocalDateTime openAt, boolean isActive, BigDecimal interestRate, BigDecimal overdraftLimit, BigDecimal minimumBalance,  int monthlyWithdrawalLimit){
         super(id, owner, BigDecimal.ZERO, openAt, isActive, interestRate, overdraftLimit);
         this.minimumBalance = minimumBalance;
         this.monthlyWithdrawalLimit = monthlyWithdrawalLimit;
@@ -29,7 +29,7 @@ public class SavingsAccount extends BankAccount{
     public void setMonthlyWithdrawalLimit(int monthlyWithdrawalLimit){ this.monthlyWithdrawalLimit = monthlyWithdrawalLimit; }
 
     @Override
-    public void withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException {
+    public Transaction withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException {
         if(withdrawalsThisMonth >= monthlyWithdrawalLimit){
             throw new InsufficientFundsException("Monthly withdrawal limit reached");
         }
@@ -39,8 +39,9 @@ public class SavingsAccount extends BankAccount{
         if(remainingBalance.compareTo(minimumBalance) == -1){
             throw new InsufficientFundsException(String.format("Cannot go below minimum balance of %s", minimumBalance.toString()));
         }        
-        super.withdraw(amount);
+        Transaction transaction = super.withdraw(amount);
         this.withdrawalsThisMonth++;
+        return transaction;
     }
 
     public void resetMonthlyDrawals(){

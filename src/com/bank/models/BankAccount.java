@@ -48,7 +48,7 @@ public abstract class BankAccount {
     public void setOverdraftLimit(BigDecimal overdraftLimit) { this.overdraftLimit = overdraftLimit; }
     public void setIsActive(boolean isActive) { this.isActive = isActive; }
 
-    public void deposit(BigDecimal amout) throws InvalidAmountException, AccountNotActiveException{
+    public Transaction deposit(BigDecimal amout) throws InvalidAmountException, AccountNotActiveException{
         
         validateAccountActive();
         validatePositiveAmount(amout);
@@ -57,9 +57,10 @@ public abstract class BankAccount {
         
         Transaction depositTransaction = new Transaction(UUID.randomUUID().toString(), null, this, amout, LocalDateTime.now(), TransactionType.DEPOSIT, TransactionStatus.SUCCESS);
         transactions.add(depositTransaction);
+        return depositTransaction;
     }
 
-    public void withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException{
+    public Transaction withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException{
         validateAccountActive();
         validatePositiveAmount(amount);
         validateSufficientFunds(amount);
@@ -68,9 +69,10 @@ public abstract class BankAccount {
 
         Transaction withdrawalTransaction = new Transaction(id, this, null, amount, LocalDateTime.now(), TransactionType.WITHDRAWAL, TransactionStatus.SUCCESS);
         transactions.add(withdrawalTransaction);
+        return withdrawalTransaction;
     }
 
-    public void transfer(BigDecimal amount, BankAccount recipient) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException{
+    public Transaction transfer(BigDecimal amount, BankAccount recipient) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException{
         validateAccountActive();
         
         if(recipient == null || !recipient.getIsActive()){
@@ -103,6 +105,7 @@ public abstract class BankAccount {
 
         transactions.add(transferTransaction);
         recipient.getTransactions().add(transferTransaction);
+        return transferTransaction;
     }
 
     public boolean approveTransaction(Transaction transaction){
