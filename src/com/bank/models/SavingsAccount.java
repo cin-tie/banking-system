@@ -1,48 +1,58 @@
 package com.bank.models;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+import com.bank.exceptions.AccountDeactivationException;
 import com.bank.exceptions.AccountNotActiveException;
 import com.bank.exceptions.InsufficientFundsException;
 import com.bank.exceptions.InvalidAmountException;
-import com.bank.models.enums.AccountType;
 
 public class SavingsAccount extends BankAccount{
-    private double interestRate;
 
-    SavingsAccount(String accountNumber, Client owner, double balance, LocalDate openingDate, boolean isActive, double interestRate){
-        super(accountNumber, owner, balance, openingDate, isActive);
-        this.interestRate = interestRate;
-        this.setAccountType(AccountType.SAVINGS);
+    private BigDecimal minimumBalance;
+    private int monthlyWithdrawalLimit;
+    private int withdrawalsThisMonth;
+
+    public SavingsAccount(String id, Client owner, BigDecimal balance, LocalDateTime openAt, boolean isActive, BigDecimal interestRate, BigDecimal overdraftLimit, BigDecimal minimumBalance,  int monthlyWithdrawalLimit){
+        super(id, owner, BigDecimal.ZERO, openAt, isActive, interestRate, overdraftLimit);
+        this.minimumBalance = minimumBalance;
+        this.monthlyWithdrawalLimit = monthlyWithdrawalLimit;
+        this.withdrawalsThisMonth = 0;
     }
 
-    public double getInterestRate() { return interestRate; }
-    public void setInterestRate(double interestRate) { this.interestRate = interestRate; }
+    public BigDecimal getMinimumBalance() { return minimumBalance; }
+    public int getMonthlyWithdrawalLimit() { return monthlyWithdrawalLimit; }
+    public int getWithdrawalsThisMonth() { return withdrawalsThisMonth; }
+
+    public void setMinimumBalance(BigDecimal minimumBalance){ this.minimumBalance = minimumBalance; }
+    public void setMonthlyWithdrawalLimit(int monthlyWithdrawalLimit){ this.monthlyWithdrawalLimit = monthlyWithdrawalLimit; }
 
     @Override
-    public void withdraw(double amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException {
-        if(!getIsActive())
-            throw new AccountNotActiveException(getAccountNumber(), getIsActive());
-        
-        if(amount <= 0)
-            throw new InvalidAmountException(amount);
+    public Transaction withdraw(BigDecimal amount) throws InsufficientFundsException, InvalidAmountException, AccountNotActiveException {
+        if(withdrawalsThisMonth >= monthlyWithdrawalLimit){
+            throw new InsufficientFundsException("Monthly withdrawal limit reached");
+        }
 
-        if(amount > getBalance())
-            throw new InsufficientFundsException(String.format("Overdraft limit exceeded in account %s. Current balance: %.2f, requested: %.2f", getAccountNumber(), getBalance(), amount));
-    
-        setBalance(getBalance() - amount);
+        BigDecimal remainingBalance = getBalance().subtract(amount);
+        
+        if(remainingBalance.compareTo(minimumBalance) == -1){
+            throw new InsufficientFundsException(String.format("Cannot go below minimum balance of %s", minimumBalance.toString()));
+        }        
+        Transaction transaction = super.withdraw(amount);
+        this.withdrawalsThisMonth++;
+        return transaction;
+    }
+
+    public void resetMonthlyDrawals(){
+        this.withdrawalsThisMonth = 0;
     }
 
     @Override
-    public boolean canWithdraw(double amount) {
-        return amount <= getBalance();
-    }
-
-    public void applyInterest() throws AccountNotActiveException{
-        if(!getIsActive())
-            throw new AccountNotActiveException(getAccountNumber(), getIsActive());
-        
-        double interest = getBalance() * interestRate / 100;
-        setBalance(getBalance() + interest);
+    public void deactivate() throws AccountDeactivationException, InsufficientFundsException, InvalidAmountException, AccountNotActiveException {
+        if(getBalance() == null || getBalance().compareTo(BigDecimal.ZERO) == -1)
+            throw new AccountDeactivationException(getAccountNumber(), getBalance());
+        withdraw(getBalance());
+        this.setIsActive(false);
     }
 }

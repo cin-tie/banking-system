@@ -1,10 +1,9 @@
 package com.bank.models;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class Client {
-    private final String uniqueId;
+    private final String id;
     private String firstName;
     private String lastName;
     private String email;
@@ -12,13 +11,8 @@ public class Client {
     private Address address;
     private final LocalDate registrationDate;
 
-    Client() {
-        uniqueId = String.valueOf(UUID.randomUUID());
-        registrationDate = LocalDate.now();
-    }
-
-    Client(String firstName, String lastName, String email, String phoneNumber, Address address){
-        uniqueId = String.valueOf(UUID.randomUUID());
+    public Client(String id, String firstName, String lastName, String email, String phoneNumber, Address address){
+        this.id = id;
         registrationDate = LocalDate.now();
         this.firstName = firstName;
         this.lastName = lastName;
@@ -42,7 +36,7 @@ public class Client {
     public Address getAddress() { return address; }
     public void setAddress(Address address) { this.address = address; }
 
-    public String getUniqueId() { return uniqueId; }
+    public String getId() { return id; }
     public LocalDate getRegistrationDate() { return registrationDate; }
 
     @Override
